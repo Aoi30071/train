@@ -397,7 +397,7 @@
                         }
                     } else if (prevName === "臺中港") {
                         if (dirType === 'odd') {
-                            html += `<optgroup label="🧭 停靠站推薦：臺中港出發南下">`;
+                            html += `<optgroup label="🧭 停靠站推薦：臺中港出發南下/進入港區">`;
                             html += `<option value="中港區">中港區 (專線) ⭐</option>`;
                             for (let i = prevIdx + 1; i < defaultStationOrder.length; i++) {
                                 const key = defaultStationOrder[i];
@@ -416,7 +416,6 @@
                             html += `</optgroup>`;
                         } else {
                             html += `<optgroup label="🧭 停靠站推薦：臺中港出發北上">`;
-                            html += `<option value="中港區">中港區 (專線)</option>`;
                             for (let i = prevIdx - 1; i >= 0; i--) {
                                 const key = defaultStationOrder[i];
                                 if (freightDatabase[key] && (freightDatabase[key].line === "海線" || freightDatabase[key].line === "幹線") && key !== "臺中港") {
