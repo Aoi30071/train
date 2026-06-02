@@ -650,21 +650,22 @@
             if (st1 === "中興支線") return 16 + getFreightDistance("二水", st2);
             if (st2 === "中興支線") return 16 + getFreightDistance(st1, "二水");
 
-            // 【跨線與幹線邏輯】
-            if (s1.line === "山線" && s2.line === "海線") {
-                if (st1 === "竹南") return s2.sea_km || s2.km;
-                if (st1 === "彰化") return Math.abs(90.2 - (s2.sea_km || s2.km));
-                return Math.min(Math.abs(s1.km - 121.7) + (s2.sea_km || s2.km), Math.abs(s1.km - 207.2) + Math.abs(90.2 - (s2.sea_km || s2.km)));
-            }
-            if (s1.line === "海線" && s2.line === "山線") {
-                if (st2 === "竹南") return s1.sea_km || s1.km;
-                if (st2 === "彰化") return Math.abs(90.2 - (s1.sea_km || s1.km));
-                return Math.min((s1.sea_km || s1.km) + Math.abs(s2.km - 121.7), Math.abs(90.2 - (s1.sea_km || s1.km)) + Math.abs(s2.km - 207.2));
-            }
+           // 【最終精確邏輯：依據幹線站位置自動鎖定樞紐】
+           if ((s1.line !== "海線" && s2.line === "海線") || (s1.line === "海線" && s2.line !== "海線")) {
+               const sea = (s1.sea_km !== undefined) ? s1 : s2;
+               const trunk = (s1.sea_km === undefined) ? s1 : s2;
 
-            return Math.abs(s1.km - s2.km);
-        }
-
+               // 邏輯：
+               // 若幹線站里程 < 160 (約在豐原后里以北)，強制走竹南(121.7)
+               // 若幹線站里程 >= 160 (約在后里以南，包含臺中、彰化以南)，強制走彰化(207.2)
+               if (trunk.km < 160) {
+                   // 經竹南：(幹線站km - 竹南km) + 海線站sea_km
+                  return Math.abs(trunk.km - 121.7) + sea.sea_km;
+              } else {
+                   // 經彰化：(幹線站km - 彰化km) + abs(海線站sea_km - 彰化海線端90.2)
+                  return Math.abs(trunk.km - 207.2) + Math.abs(sea.sea_km - 90.2);
+              }
+            }
         function calculateReport() {
             const names = document.querySelectorAll('.st-name');
             const guaRs = document.querySelectorAll('.st-gua-r');
