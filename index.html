@@ -179,7 +179,8 @@
             <button type="button" class="btn" id="btnCloseModal" style="margin-top: 15px; background-color: #4a5568;">關閉視窗</button>
         </div>
     </div>
-// 1. 修正版資料庫（保留您原始所有結構，僅補齊 sea_km 與修正里程）
+
+    <script>
         const freightDatabase = {
             "新竹貨": { line: "幹線", km: 101.6 },
             "新竹": { line: "幹線", km: 102.7 },
@@ -224,24 +225,6 @@
             "車埕": { line: "集集線", km: 29.6, parent: "二水" },
             "中港區": { line: "專線", km: 13.0, parent: "臺中港" }
         };
-
-        // 2. 修正版計算函式（掛載於全域，會被後面的 getFreightDistance 覆蓋或您可以直接取代舊的）
-        function getFreightDistance(st1, st2) {
-            const s1 = freightDatabase[st1];
-            const s2 = freightDatabase[st2];
-            if (!s1 || !s2) return 0;
-            
-            // 如果兩站都有 sea_km（海線區間），執行雙軸里程計算
-            if (s1.sea_km !== undefined && s2.sea_km !== undefined) {
-                return Math.abs(s1.sea_km - s2.sea_km);
-            }
-            // 其餘走您原本的邏輯
-            if (s1.line === "專線" && s1.parent === st2) return s1.km;
-            if (s2.line === "專線" && s2.parent === st1) return s2.km;
-            // ... (維持您原本的邏輯)
-            return Math.abs(s1.km - s2.km);
-        }
-    <script>
        
         const defaultStationOrder = ["新竹貨", "新竹", "竹南", "談文", "白沙屯", "通霄", "苑裡", "大甲", "臺中港", "中港區", "清水", "沙鹿", "龍井", "大肚", "追分", "苗栗", "銅鑼", "三義", "后里", "豐原", "潭子", "臺中", "新烏日", "成功", "彰化", "員林", "社頭", "田中", "二水", "中興支線", "源泉", "濁水", "龍泉", "集集", "水里", "車埕", "林內", "斗六", "斗南", "大林", "民雄", "嘉義"];
 
@@ -637,6 +620,13 @@
             const s2 = freightDatabase[st2];
             if (!s1 || !s2) return 0;
 
+            // 【精準里程計算邏輯】
+            // 若兩站皆有 sea_km 屬性，視為海線區間，計算 sea_km 差值
+            if (s1.sea_km !== undefined && s2.sea_km !== undefined) {
+                return Math.abs(s1.sea_km - s2.sea_km);
+            }
+
+            // 【原本邏輯】保留所有支線、集集線、專線判斷
             if (s1.line === "專線" && s1.parent === st2) return s1.km;
             if (s2.line === "專線" && s2.parent === st1) return s2.km;
             if (s1.line === "專線" && s2.line === "專線" && s1.parent === s2.parent) return Math.abs(s1.km - s2.km);
@@ -652,15 +642,16 @@
             if (st1 === "中興支線") return 16 + getFreightDistance("二水", st2);
             if (st2 === "中興支線") return 16 + getFreightDistance(st1, "二水");
 
+            // 【跨線與幹線邏輯】
             if (s1.line === "山線" && s2.line === "海線") {
-                if (st1 === "竹南") return s2.km;
-                if (st1 === "彰化") return Math.abs(90.2 - s2.km);
-                return Math.min(Math.abs(s1.km - 121.7) + s2.km, Math.abs(s1.km - 207.2) + Math.abs(90.2 - s2.km));
+                if (st1 === "竹南") return s2.sea_km || s2.km;
+                if (st1 === "彰化") return Math.abs(90.2 - (s2.sea_km || s2.km));
+                return Math.min(Math.abs(s1.km - 121.7) + (s2.sea_km || s2.km), Math.abs(s1.km - 207.2) + Math.abs(90.2 - (s2.sea_km || s2.km)));
             }
             if (s1.line === "海線" && s2.line === "山線") {
-                if (st2 === "竹南") return s1.km;
-                if (st2 === "彰化") return Math.abs(90.2 - s1.km);
-                return Math.min(s1.km + Math.abs(s2.km - 121.7), Math.abs(90.2 - s1.km) + Math.abs(s2.km - 207.2));
+                if (st2 === "竹南") return s1.sea_km || s1.km;
+                if (st2 === "彰化") return Math.abs(90.2 - (s1.sea_km || s1.km));
+                return Math.min((s1.sea_km || s1.km) + Math.abs(s2.km - 121.7), Math.abs(90.2 - (s1.sea_km || s1.km)) + Math.abs(s2.km - 207.2));
             }
 
             return Math.abs(s1.km - s2.km);
