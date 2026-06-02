@@ -88,7 +88,15 @@
             box-sizing: border-box;
         }
         .btn-secondary { background-color: #6c757d; }
-        .btn-danger { background-color: #e53e3e; padding: 6px 12px; width: auto; font-size: 0.8rem; border-radius: 6px; margin-top: 0; }
+        .btn-danger { 
+            background-color: #e53e3e; 
+            color: white !important; /* 強制設定為白色 */
+            padding: 6px 12px; 
+            width: auto; 
+            font-size: 0.8rem; 
+            border-radius: 6px; 
+            margin-top: 0; 
+        }
 
         .modal {
             display: none;
@@ -150,7 +158,7 @@
         </div>
     </div>
 
-    <div class="section-title">列車停靠站點流向</div>
+    <div class="section-title">列車停靠站</div>
     
     <div id="stationContainer"></div>
 
@@ -351,7 +359,7 @@
                         html = '<option value="">請先選擇前一站</option>';
                     } else if (prevName === "二水") {
                         if (dirType === 'odd') {
-                            html += `<optgroup label="🧭 車次奇偶推薦：二水出發南下流向">`;
+                            html += `<optgroup label="🧭 停靠站推薦：二水出發南下">`;
                             html += `<option value="中興支線">中興支線 (支線)</option>`;
                             html += `<option value="源泉">源泉 (集集線)</option>`;
                             for (let i = prevIdx + 1; i < defaultStationOrder.length; i++) {
@@ -369,7 +377,7 @@
                             }
                             html += `</optgroup>`;
                         } else {
-                            html += `<optgroup label="🧭 車次奇偶推薦：二水出發北上流向">`;
+                            html += `<optgroup label="🧭 停靠站推薦：二水出發北上">`;
                             html += `<option value="中興支線">中興支線 (支線)</option>`;
                             html += `<option value="源泉">源泉 (集集線)</option>`;
                             for (let i = prevIdx - 1; i >= 0; i--) {
@@ -389,7 +397,7 @@
                         }
                     } else if (prevName === "臺中港") {
                         if (dirType === 'odd') {
-                            html += `<optgroup label="🧭 車次奇偶推薦：臺中港出發南下流向">`;
+                            html += `<optgroup label="🧭 停靠站推薦：臺中港出發南下">`;
                             html += `<option value="中港區">中港區 (專線) ⭐</option>`;
                             for (let i = prevIdx + 1; i < defaultStationOrder.length; i++) {
                                 const key = defaultStationOrder[i];
@@ -407,7 +415,7 @@
                             }
                             html += `</optgroup>`;
                         } else {
-                            html += `<optgroup label="🧭 車次奇偶推薦：臺中港出發北上流向">`;
+                            html += `<optgroup label="🧭 停靠站推薦：臺中港出發北上">`;
                             html += `<option value="中港區">中港區 (專線)</option>`;
                             for (let i = prevIdx - 1; i >= 0; i--) {
                                 const key = defaultStationOrder[i];
@@ -426,7 +434,7 @@
                         }
                     } else if (prevInfo && (prevInfo.line === "集集線" || prevName === "中興支線")) {
                         if (dirType === 'odd') {
-                            html += `<optgroup label="🧭 車次奇偶推薦：往支線內南下/深入">`;
+                            html += `<optgroup label="🧭 停靠站推薦：往支線內南下/深入">`;
                             defaultStationOrder.forEach(key => {
                                 const info = freightDatabase[key];
                                 if (info && (info.line === "集集線" || key === "中興支線") && key !== prevName) {
@@ -440,7 +448,7 @@
                             select.innerHTML = html;
                             return;
                         } else {
-                            html += `<optgroup label="🧭 車次奇偶推薦：由支線內北上/往二水">`;
+                            html += `<optgroup label="🧭 停靠站推薦：由支線內北上/往二水">`;
                             html += `<option value="二水">二水 (幹線) ⭐</option>`;
                             defaultStationOrder.forEach(key => {
                                 const info = freightDatabase[key];
@@ -455,14 +463,14 @@
                             html += `</optgroup>`;
                         }
                     } else if (prevName === "中港區") {
-                        html += `<optgroup label="🧭 車次奇偶推薦：中港區出專線">`;
+                        html += `<optgroup label="🧭 停靠站推薦：中港區出專線">`;
                         html += `<option value="臺中港">臺中港 (海線) ⭐</option>`;
                         html += `</optgroup><optgroup label="其餘幹線車站">`;
                         defaultStationOrder.forEach(key => { if (key !== "臺中港" && key !== "中港區") html += `<option value="${key}">${getOptionText(key)}</option>`; });
                         html += `</optgroup>`;
                     } else {
                         if (dirType === 'even') {
-                            html += `<optgroup label="🧭 車次奇偶推薦：山海線北上方向">`;
+                            html += `<optgroup label="🧭 停靠站推薦：山海線北上方向">`;
                             for (let i = prevIdx - 1; i >= 0; i--) {
                                 const key = defaultStationOrder[i];
                                 const info = freightDatabase[key];
@@ -493,7 +501,7 @@
                             }
                             html += `</optgroup>`;
                         } else {
-                            html += `<optgroup label="🧭 車次奇偶推薦：山海線南下方向">`;
+                            html += `<optgroup label="🧭 停靠站推薦：山海線南下方向">`;
                             for (let i = prevIdx + 1; i < defaultStationOrder.length; i++) {
                                 const key = defaultStationOrder[i];
                                 const info = freightDatabase[key];
